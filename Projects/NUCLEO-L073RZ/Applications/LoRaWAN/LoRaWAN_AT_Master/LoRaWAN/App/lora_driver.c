@@ -28,6 +28,8 @@
 #include "ee.h"
 #include "stm32_mem.h"
 #include "app_master.h"
+#include "lrwan_ns1_printf.h"
+
 #if USE_LRWAN_NS1
 #include "stdio.h"
 #include "usart.h"
@@ -1978,7 +1980,7 @@ void Lora_fsm(void)
 
         /* Re-reading to be sure that IDs's node have been taken into account*/
         // uint32_t devAddr[4]; // YB: also hide this field, else warning unused
-        //LoRa_GetDeviceAddress(devAddr); // YB : this function crashes probably because of a bad pointer usage in lrwan_ns1 driver FIXME
+			//LoRa_GetDeviceAddress(devAddr); // YB : this function crashes probably because of a bad pointer usage in lrwan_ns1 driver FIXME
 
         Lora_SetJoinMode(LoraDriverParam->JoinMode);
 #endif
@@ -2066,6 +2068,7 @@ void Lora_fsm(void)
           }
 #ifdef USE_LRWAN_NS1
         case ATCTL_RET_IDLE:
+
 #else
         case AT_JOIN_SLEEP_TRANSITION:    /*waiting asynchronous event from modem*/
 #endif
@@ -2152,7 +2155,6 @@ void Lora_fsm(void)
 #endif
 
         /*Sensor reading on slave device*/
-        LoraDriverCallbacks->SensorMeasureData(&SendDataBinary);
 
 #ifdef USE_I_NUCLEO_LRWAN1              /* Led on Modem slave device to indicate a send request*/
         Master_LED_Modem_On(LED_GREEN);
@@ -2168,6 +2170,9 @@ void Lora_fsm(void)
         UTIL_TIMER_Start(&DemoLedTimer);
 
         // 9. TODO LORA
+        LoraCmdRetCode= Lora_SendDataBin(&SendDataBinary);
+  	    dbg_printf_send("La LoraCmd : %d\n",LoraCmdRetCode );
+
         // call the appropriate Lora driver function to send the binary data we formatted earlier.
         // also: check and print the return code, verbose it and compare against status AT_OK 
 

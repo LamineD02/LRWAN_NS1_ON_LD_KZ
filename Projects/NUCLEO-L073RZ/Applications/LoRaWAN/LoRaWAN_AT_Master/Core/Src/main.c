@@ -30,6 +30,8 @@
 #include "app_master.h"
 #include <stdarg.h>
 #include "rtc_if.h"
+#include "lrwan_ns1_printf.h"
+#include "master_app.h"
 
 #include ATCMD_MODEM        /* preprocessing definition in sys_conf.h*/
 
@@ -72,7 +74,6 @@ int main(void)
   /* Configure the system clock */
   SystemClock_Config();
 
-
   /* Initialize all configured peripherals */
   MX_Master_Init();
   #define __APP_VERSION 0x12345678 // YB: tentative usage for DBG_PRINTF, FIXME: not tested
@@ -80,6 +81,7 @@ int main(void)
   /* DBG_PRINTF("before idle \n"); */ /*could be a semi-hosting printf */
 
   // 0. TODO LORA USE_LRWAN_NS1: Print "init done" on console
+  dbg_printf_send("fonction de log %s\n", __FUNCTION__);
   // 0. TODO LORA USE_LRWAN_NS1: hint: use dbg_printf_send() (where is it? how does it work?)
  
   /* Infinite loop */
