@@ -20,6 +20,8 @@
 /* Includes ------------------------------------------------------------------*/
 #include "sys_sensors.h"
 #include "lrwan_ns1_temperature.h"
+#include "lrwan_ns1_pressure.h"
+#include "lrwan_ns1_humidity.h"
 /* USER CODE BEGIN Includes */
 
 /* USER CODE END Includes */
@@ -65,6 +67,8 @@ IKS01A2_ENV_SENSOR_Capabilities_t EnvCapabilities;
 
 // 3. TODO LORA USE_LRWAN_NS1: instanciate handle variables for humidity, temperature and pressure
 void *temp_handle;
+void *pressure_handle;
+void *humidity_handle;
 // 3. TODO LORA USE_LRWAN_NS1: #if defined()/#endif style
 
 /* USER CODE END PV */
@@ -86,6 +90,9 @@ void EnvSensors_Read(sensor_t *sensor_data)
 
   // 5. TODO LORA USE_LRWAN_NS1: get values from humidity, temperature and pressure sensors
   BSP_TEMPERATURE_Get_Temp(temp_handle, &TEMPERATURE_Value);
+  BSP_HUMIDITY_Get_Hum(	humidity_handle, &HUMIDITY_Value);
+  BSP_PRESSURE_Get_Press(pressure_handle, &PRESSURE_Value);
+
   // 5. TODO LORA USE_LRWAN_NS1: #if defined()/#elif style (next if becomes an elif)
   // 5. TODO LORA USE_LRWAN_NS1: otherwhise they are always using the same default values (which ones?)
 #if defined (SENSOR_ENABLED) && (SENSOR_ENABLED == 1)
@@ -120,7 +127,13 @@ void  EnvSensors_Init(void)
   
   // 4. TODO LORA USE_LRWAN_NS1: initialize sensors
 	BSP_TEMPERATURE_Init(HTS221_T_0 ,  &temp_handle);
+	BSP_PRESSURE_Init(PRESSURE_SENSORS_AUTO, &pressure_handle);
+	BSP_HUMIDITY_Init(HTS221_H_0, &humidity_handle);
+
 	BSP_TEMPERATURE_Sensor_Enable(temp_handle);
+	BSP_PRESSURE_Sensor_Enable(pressure_handle);
+	BSP_HUMIDITY_Sensor_Enable(humidity_handle);
+
   // 4. TODO LORA USE_LRWAN_NS1: #if defined()/#elif style (next if becomes an elif)
   // 4. TODO LORA USE_LRWAN_NS1: and maybe also do something else (are they activated?)
 

@@ -170,13 +170,15 @@ static void SensorMeasureData(sSendDataBinary_t *SendDataBinary)
   // 1. TODO LORA USE_LRWAN_NS1: uncomment those variables below vvv
   /*uint16_t pressure = 0;
 
-  uint8_t humidity = 0;
+
                  // end device connected to external power source
   ATEerror_t LoraCmdRetCode;
   */
+  uint8_t humidity = 0;
   uint8_t index = 0;
   int16_t temperature = 0;
   uint32_t BatLevel = 0;
+  uint16_t pression=0;
   /*read pressure, Humidity and Temperature in order to be send on LoRaWAN*/
   EnvSensors_Read(&Sensor);
 
@@ -197,6 +199,9 @@ static void SensorMeasureData(sSendDataBinary_t *SendDataBinary)
 	  uint8_t battery_percent = (uint8_t)((BatLevel* 100U)/254U);
   // 6. TODO LORA: convert temperature, pressure, humidity to data for SendDataBinary->Buffer
 	   temperature=Sensor.temperature*10;
+	   pression= Sensor.pressure/10;
+	   humidity= Sensor.humidity;
+	   dbg_printf_send("La pression en deca pascal: %d\n\r", pression);
 	   dbg_printf_send("La temperature convertie : %d\n\r", temperature);
 	   const char group[]="LD_ON_KZ";
 	   uint8_t gid_len =sizeof(group)- 1;
@@ -218,8 +223,20 @@ static void SensorMeasureData(sSendDataBinary_t *SendDataBinary)
 	   SendDataBinary->Buffer[index++] =  (temperature>>8) & 0xFF;
 	   SendDataBinary->Buffer[index++] =  temperature & 0xFF;
 
-	   //Bloc batterie
 	   SendDataBinary->Buffer[index++] = 0x03;
+	   SendDataBinary->Buffer[index++] =LPP_DATATYPE_BAROMETER
+			   ;
+	   SendDataBinary->Buffer[index++] =  0x02;
+	   SendDataBinary->Buffer[index++] =  (pression>>8) & 0xFF;
+	   SendDataBinary->Buffer[index++] =  pression & 0xFF;
+
+	   SendDataBinary->Buffer[index++] = 0x04;
+	   SendDataBinary->Buffer[index++] =LPP_DATATYPE_HUMIDITY;
+	   SendDataBinary->Buffer[index++] =  0x01;
+	   SendDataBinary->Buffer[index++] =  humidity;
+
+	   //Bloc batterie
+	   SendDataBinary->Buffer[index++] = 0x05;
 	   SendDataBinary->Buffer[index++] =LPP_DATATYPE_DIGITAL_INPUT;
 	   SendDataBinary->Buffer[index++] =  0x01;
 	   SendDataBinary->Buffer[index++] = battery_percent;
